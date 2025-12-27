@@ -1,18 +1,18 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
-MODEL = "google/flan-t5-large"
+MODEL_NAME = "google/flan-t5-base"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL)
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL).cuda()
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
-def generate(prompt, temperature=0.7, max_tokens=128):
-    inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+def generate(prompt: str, temperature=0.7, max_tokens=128) -> str:
+    inputs = tokenizer(prompt, return_tensors="pt")
     with torch.no_grad():
-        output = model.generate(
+        outputs = model.generate(
             **inputs,
+            max_new_tokens=max_tokens,
             do_sample=True,
-            temperature=temperature,
-            max_new_tokens=max_tokens
+            temperature=temperature
         )
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)
